@@ -2,6 +2,7 @@
 Emotion based filtering, intended for use with Snapchat.  The example used with our model is the classic "dog face" filter in Snapchat.  We detect the agent's emotion, and then adjust the filter contents (e.g., sad ears or happy ears) based on the classified emotion.
 
 # Installation
+## Virtual Environment
 In order to easily run all of the files, and make sure that all dependencies are satsified, it is easiest to use a virtual environment.
 To install the virtualenv module, run the following in a new terminal session (make sure that no other virtual environments are active):
 
@@ -29,7 +30,15 @@ Next install the necessary packages to your virtual environment by running these
 ```
 (note: (emotion_venv) is included to indicate you should have called the source command above to enter the virtual environment before installing)
 
-At this point you should be ready to run the files!  See the next section for how to run everything.
+## VSCode Setup on MacOS
+If you're running this in VSCode, and are on MacOS, you might need to take an extra step to get everything going
+* In an active VSCode window, press `Command+Shift+P` which will open a search bar for VSCode related settings
+* Type `shell command` and then click on the option that says `Shell Command: Install 'code' command in PATH`
+* Close VSCode completely (right click and quit)
+* Open a fresh terminal and type `sudo code`
+* Cd into the `emotion-based-filter` directory and then run the virtual environment
+
+At this point you should be ready to run the files!  See the next section for how to run everything.  You needed to run VSCode as root because otherwise the privacy permissions will be denied, and the video capture will always fail.  Running as root lets you enable webcam capture!
 
 # How to run
 ```
