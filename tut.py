@@ -1,8 +1,7 @@
 import argparse
-
-import cv2
 from imutils.video import VideoStream
 from imutils import face_utils, translate, resize
+import cv2
 
 import time
 import dlib
