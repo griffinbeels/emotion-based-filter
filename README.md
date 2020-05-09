@@ -33,7 +33,7 @@ At this point you should be ready to run the files!  See the next section for ho
 
 # How to run
 ```
-python3.7 tut.py -predictor /lib/68_face.dat.bz2
+python3.7 py/face_detection.py
 ```
 For now to run tut.py you need to pip install dlib in the old venv and update the opencv in the venv.
 Then download the 68 point predictor for faces from here https://github.com/davisking/dlib-models,
