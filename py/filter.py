@@ -14,9 +14,9 @@ def detectAndDisplay(frame, face_cascade, eyes_cascade):
 
     # Classify emotion (single face TODO expand to all faces)
     # and apply filter to frame
-    # if faces[0] != None:
-    #     emotion = classifyEmotion(faces[0])
-    #     cv.imshow('emotion-based-filter', applyFilterToFrame)
+    if len(faces) > 0:
+        emotion = classifyEmotion(frame_gray, faces[0])
+        #cv.imshow('emotion-based-filter', applyFilterToFrame)
 
     for (x,y,w,h) in faces:
         center = (x + w//2, y + h//2)
@@ -31,10 +31,14 @@ def detectAndDisplay(frame, face_cascade, eyes_cascade):
     cv.imshow('Capture - Face detection', frame)
 
 
-def classifyEmotion(face):
+def classifyEmotion(frame_gray, face):
     """
     For some face input, normalized to 48x48, we will determine the emotion
     """
+    (x, y, w, h) = face
+    faceROI = frame_gray[y:y+h,x:x+w]
+    #cv.imshow('emotion-based-filter', faceROI) # 
+    print(x, y, w, h)
     return None 
 
 def applyFilterToFrame(face, frame, emotion):
