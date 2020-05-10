@@ -39,11 +39,7 @@ def detect_and_display(frame, face_cascade, eyes_cascade, model):
     # and apply filter to frame
     if len(faces) > 0:
         emotion = classify_emotion(frame_gray, faces[0], model)
-        print(emotion)
-        #cv2.putText(frame, emotion_dict[maxindex], (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        #cv2.imshow('Video', cv2.resize(frame (1600,960),interpolation = cv2.INTER_CUBIC))
-
-        #cv.imshow('emotion-based-filter', applyFilterToFrame)
+        print(EMOTIONS[emotion])
 
     for (x,y,w,h) in faces:
         center = (x + w//2, y + h//2)
@@ -64,16 +60,13 @@ def classify_emotion(frame_gray, face, model):
     # slice out the face region
     (x, y, w, h) = face
     face_gray_from_frame = frame_gray[y:y+h,x:x+w]
-    #cv.imshow('emotion-based-filter', faceROI)
-    #print(x, y, w, h)
 
     #paper called for standard 48x48 sizing of any input 
     resized = np.expand_dims(np.expand_dims(cv.resize(face_gray_from_frame, (INPUT_DIM, INPUT_DIM)), -1), 0)
 
     # Predict & return classification
     prediction = model.predict(resized)
-    detected_emotion_index = int(np.argmax(prediction))
-    return EMOTIONS[detected_emotion_index]
+    return int(np.argmax(prediction))
 
 def apply_filter_to_frame(face, frame, emotion):
     """
