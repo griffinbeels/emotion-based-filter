@@ -33,7 +33,7 @@ class Filter:
         self.nose = cv.imread("img/nose.png", -1)
 
         # stores the last detected nose coordinates so that the image doesn't flicker
-        self.nose_cache = None
+        self.nose_cache = []
 
     def detect_and_display(self, frame, face_cascade, eyes_cascade, nose_cascade, model):
         """
@@ -128,8 +128,13 @@ class Filter:
                 alpha_l1 = 1.0 - alpha_s1
                 alpha_l2 = 1.0 - alpha_s2
                 for c in range(0, 3):
-                    frame[y1:y2, x1:x2, c] = (alpha_s * self.elected_left_ear[:, :, c]) + (alpha_l * frame[y1:y2, x1:x2, c])
-                    frame[y11:y21, x11:x21, c] =  (alpha_s1 * self.elected_right_ear[:, :, c] + alpha_l1 * frame[y11:y21, x11:x21, c])
+                    # Need to make sure all shapes are in bounds
+                    if (y1 > 0 and y1 < frame.shape[0] and x1 > 0 and x1 < frame.shape[1] and
+                        y2 > 0 and y2 < frame.shape[0] and x2 > 0 and x2 < frame.shape[1]):
+                        frame[y1:y2, x1:x2, c] = (alpha_s * self.elected_left_ear[:, :, c]) + (alpha_l * frame[y1:y2, x1:x2, c])
+                    if (y11 > 0 and y11 < frame.shape[0] and x11 > 0 and x11 < frame.shape[1] and
+                        y21 > 0 and y21 < frame.shape[0] and x21 > 0 and x21 < frame.shape[1]):
+                        frame[y11:y21, x11:x21, c] =  (alpha_s1 * self.elected_right_ear[:, :, c] + alpha_l1 * frame[y11:y21, x11:x21, c])
                     if is_nose:
                         frame[y12:y22, x12:x22, c] =  (alpha_s2 * self.nose[:, :, c] + alpha_l2 * frame[y12:y22, x12:x22, c])
 
