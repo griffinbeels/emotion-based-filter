@@ -3,7 +3,7 @@ import argparse
 import cv2 as cv
 from hyperparameters import HAAR_EYE_FILE_PATH, HAAR_FACE_FILE_PATH, CAMERA_IDX
 from emotion import train_or_load_model
-from filter import detect_and_display
+from filter import Filter
 
 def parse_input_and_load():
     """
@@ -60,6 +60,10 @@ def main():
     if not cap.isOpened:
         print('--(!)Error opening video capture')
         exit(0)
+    
+    # Generate a filter object to maintain state
+    my_filter = Filter()
+
     while True:
         # read the current frame and verify successful capture
         ret, frame = cap.read()
@@ -68,7 +72,7 @@ def main():
             break
 
         # if valid, we process the frame -- i.e., detect face + emotion + apply filter
-        detect_and_display(frame, face_cascade, eyes_cascade, model)
+        my_filter.detect_and_display(frame, face_cascade, eyes_cascade, model)
 
         # corresponds to ESC key
         if cv.waitKey(10) == 27:

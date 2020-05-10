@@ -10,6 +10,18 @@ class Emotion(enum.Enum):
     sad = 5
     surprised = 6
 
+# Maps numbers [0, 6] to each emotion, for use in processing the model classification; uses Emotion enum
+EMOTIONS = {Emotion.angry: "Angry",
+            Emotion.disgusted: "Disgusted",
+            Emotion.fearful: "Fearful", 
+            Emotion.happy: "Happy", 
+            Emotion.neutral: "Neutral", 
+            Emotion.sad: "Sad", 
+            Emotion.surprised: "Surprised"}
+
+# The required number of frames to be processed before a filter is elected and votes are tallied.
+VOTES_REQUIRED_FOR_ELECTION = 3
+
 # These files are run from the /py directory
 TRAINING_DIRECTORY = "data/train"
 TESTING_DIRECTORY = "data/test"
@@ -21,15 +33,6 @@ HAAR_EYE_FILE_PATH = "ocv/haarcascade_eye_tree_eyeglasses.xml"
 
 # Default camera index - change if using external webcam
 CAMERA_IDX = 0
-
-# Maps numbers [0, 6] to each emotion, for use in processing the model classification; uses Emotion enum
-EMOTIONS = {Emotion.angry: "Angry",
-            Emotion.disgusted: "Disgusted",
-            Emotion.fearful: "Fearful", 
-            Emotion.happy: "Happy", 
-            Emotion.neutral: "Neutral", 
-            Emotion.sad: "Sad", 
-            Emotion.surprised: "Surprised"}
 
 # Research paper (in root directory) calls for all input to be 48x48
 INPUT_DIM = 48
