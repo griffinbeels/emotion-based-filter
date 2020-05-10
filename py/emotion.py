@@ -12,9 +12,21 @@ import os
 
 def classify_emotion(frame_gray, face, model):
     """
-    For some face input, normalized to 48x48, we will determine the emotion
+    Classifies a face into one of seven Emotion categories (see hyperparameters.py) 
+    based on the face's features.
 
-    Returns the softmax result of the output as an Emotion enum!
+    Input:
+        frame_gray :: array 
+            - desc: original camera frame after grayscale filter applied
+        face :: tuple 
+            - desc: the x,y position (top left) of the desired face to classify,
+                    as well as its w,h (width, height).  Defines the face's bounding
+                    box
+        model :: Sequential Tensorflow Model
+            - desc: model trained to classify Emotion
+
+    Output: 
+        -the softmax result of the model's prediction cast to an Emotion.
     """
     # slice out the face region
     (x, y, w, h) = face
@@ -29,8 +41,15 @@ def classify_emotion(frame_gray, face, model):
 
 def get_num_images_in_dir(directory):
     """
-    Parses the provided directory to determine the number of images in the directory that 
-    match the provided emotions.
+    Parses the provided directory to determine the total number of files in the directory.
+    This assumes that the directory only contains images to be used in training / testing.
+
+    Input:
+        directory :: string
+            - desc: path to the directory to parse; should be either the training or testing directory.
+    
+    Output:
+        -the number of files contained in the provided directory, including inside each emotion folders.
     """
     # Get list of all images in training directory
     categories = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprised"]
@@ -42,10 +61,17 @@ def get_num_images_in_dir(directory):
 
 def train_or_load_model(mode):
     """
-    Sets up the model used for emotion classification.  If mode "train" was selected,
-    then this will train a new model and store the results in "model.h5"; if mode "display"
-    was selected (or no args were entered), then this will return the stored "model.h5" 
-    loaded into the model.
+    Sets up the model used for emotion classification, by either training a new model,
+    or loading a pre-existing model.  
+    
+    Input: 
+        mode :: string
+            -desc: If mode "train" was selected, then this will train a new model and
+            store the results in "model.h5"; if mode "display" was selected (or no args were entered),
+            then this will return the stored "model.h5" loaded into the model.
+    
+    Output:
+        - the trained or loaded sequential model
     """
     # Tally the number of images in both directories 
     num_training = get_num_images_in_dir(TRAINING_DIRECTORY)

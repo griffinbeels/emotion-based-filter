@@ -7,10 +7,17 @@ from filter import detect_and_display
 
 def parse_input_and_load():
     """
-    Helper method to parse all input & do any intial loading of data.
+    Parses all input & does any intial loading of data, including error checks.
 
-    output:
-        -tuple containing (mode, face_cascade, eyes_cascade, camera_device)
+    Input: 
+        None
+
+    Output: 
+        a tuple containing (mode, face_cascade, eyes_cascade, camera_device):
+            -mode is either ["train" or "display"]
+            -face_cascade is the loaded cascade file from OpenCV for faces
+            -eye_cascade is the loaded cascade file from OpenCV for eyes
+            -camera_device is the index of the loaded camera
     """
     #-- argument setup
     parser = argparse.ArgumentParser(description='Code for Emotion Based Filtering.')
@@ -37,6 +44,11 @@ def parse_input_and_load():
     return (mode, face_cascade, eyes_cascade, camera_device)
 
 def main():
+    """ 
+    Parses input, loads or trains the CNN, and then begins a read loop on the 
+    user's webcam until stopped by the ESC key, in order to perform face & emotion
+    detection.
+    """
     #-- parse the arguments passed into this py file in prep for the main read loop
     (mode, face_cascade, eyes_cascade, camera_device) = parse_input_and_load()
 

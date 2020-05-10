@@ -8,7 +8,22 @@ import numpy as np
 
 def detect_and_display(frame, face_cascade, eyes_cascade, model):
     """
-    Given a frame, we 
+    Given a camera frame loaded from the user's webcam, detects all visible faces,
+    classifies emotion for any faces found, and changes between a set of filters depending 
+    on the emotion that the model classifies.
+
+    Input:
+        -frame :: RGB array
+            -desc: the frame currently being processed, provided by the webcam
+        -face_cascade :: loaded xml file
+            -desc: the cascade xml obtained from OpenCV for use in face detection
+        -eyes_cascade :: loaded xml file
+            -desc: the cascade xml obtained from OpenCV for use in eye detection
+        model :: Sequential Tensorflow Model
+            -desc: model trained to classify Emotion
+    
+    Output:
+        None (displays an image after each call using cv.imshow)
     """
     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     frame_gray = cv.equalizeHist(frame_gray)
@@ -75,6 +90,13 @@ def choose_filter(emotion):
         NEUTRAL - Neutral, Fearful 
     Fearful is included under the neutral filter because it seems that our dataset overfit for Fearful -- 
     for this reason, misclassifications will be sent to neutral if they are fearful.
+
+    Input: 
+        -emotion :: Emotion
+            -desc: the emotion that the model classified; is one of the members within the Emotion enum.
+    
+    Output:
+        - the correct left / right ears loaded from cv.imread based on the emotion provided.
     """
     # TODO: Change the scaling of each image (as each is slightly differently sized & oriented)
     if emotion == Emotion.happy or emotion == Emotion.surprised:

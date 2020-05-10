@@ -66,6 +66,8 @@ The only parameters you might want to change are:
 
 * `--camera`: by default, this is `0` which represents your built in webcam.  If you would like to use an external webcam, then change this number until it works.
 
+If you wish to use a different model, simply change `MODEL_DATA_FILE_PATH` in `/emotion-based-filter/py/hyperparameters.py` to the file path representing your model of choice.  This may cause issues in our code, so do this at your own risk.
+
 ## **Results**
 Our results are outlined in a formal paper included in our repo as `/emotion-based-filter/report.pdf`, including plenty of pictures!  
 In the ideal world, this would work directly on Snapchat, but we limited our scope to simply run on live webcam footage.  We also ran into issues relating to Snapchat, because many of the APIs available are in Javascript, which means our access to Computer Vision related libraries is far more limited.
