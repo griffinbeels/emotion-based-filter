@@ -13,6 +13,7 @@ For emotion detection, we used the FER-2013 dataset, [downloadable here](https:/
 The "Facial Expression Recogition 2013" or "FER-2013" dataset is [downloadable here](https://drive.google.com/file/d/1X60B-uR3NtqPd4oosdotpbDgy8KOfUdr/view).
 Once downloaded, copy the contents of the folder to the root `/emotion-based-filter/` folder.  Afterwards, we will now have a `/emotion-based-filter/data` folder containing a `test` and `train` folder for use to train the CNN for emotion detection.  
 It is also possible that this repo actually *already* contains the `data/test` and `data/train` folders, in which case you should ignore this subsection.
+Additionally, we include a model that *we did not train* from [priya-dwivedi](https://github.com/priya-dwivedi/face_and_emotion_detection), who has made their trained model public!  Check the [How to Run section](# How to Run) for details on how to swap between our model and Priya's model.
 
 ### **Virtual Environment**
 In order to easily run all of the files, and make sure that all dependencies are satsified, it is easiest to use a virtual environment.
@@ -52,7 +53,7 @@ If you're running this in VSCode, and are on MacOS, you might need to take an ex
 
 At this point you should be ready to run the files!  See the next section for how to run everything.  You needed to run VSCode as root because otherwise the privacy permissions will be denied, and the video capture will always fail.  Running as root lets you enable webcam capture!
 
-## **How to run**
+## How to Run
 To run without any changes (i.e., open your webcam, load the pretrained weights, detect emotion on each frame), simply cd to this repo, and then run:
 
 ```
@@ -64,6 +65,8 @@ The only parameters you might want to change are:
 * `--model_mode`: entering "train" will train the CNN using the provided FER-2013 dataset over 50 epochs before running your webcam; entering nothing, or explicitly entering "display" will simply run the process described at the beginning of this section.
 
 * `--camera`: by default, this is `0` which represents your built in webcam.  If you would like to use an external webcam, then change this number until it works.
+
+
 
 ## **Results**
 Our results are outlined in a formal paper included in our repo as `/emotion-based-filter/report.pdf`, including plenty of pictures!  

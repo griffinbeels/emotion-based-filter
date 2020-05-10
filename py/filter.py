@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.models import load_model
 import os
 
 # This file is run from the /py directory -- therefore, we go up a directory
@@ -99,8 +100,8 @@ def train_or_load_model(mode):
     num_testing = get_num_images_in_dir(TESTING_DIRECTORY)
 
     # Create the model
-    # 2 convolutional layers followed by max pooling & dropout, then 2x(C2D -> MaxPooling)
-    # then another dropout, followed by flatten, dense (relu), dropout, dense (softmax)
+    #2 convolutional layers followed by max pooling & dropout, then 2x(C2D -> MaxPooling)
+    #then another dropout, followed by flatten, dense (relu), dropout, dense (softmax)
     model = Sequential()
 
     model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(INPUT_DIM,INPUT_DIM,1)))
@@ -150,6 +151,7 @@ def train_or_load_model(mode):
     # display live, so simply load the weights and return
     elif mode == "display":
         model.load_weights(MODEL_DATA_FILE_PATH)
+        #model = load_model(MODEL_DATA_FILE_PATH) # UNCOMMENT IF YOU WANT TO USE THE ALT MODEL
     else:
         print("ERROR: Invalid mode please enter one of [train, display]")
         return None
