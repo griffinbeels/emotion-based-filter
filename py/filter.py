@@ -73,6 +73,7 @@ def main():
             break
         detectAndDisplay(frame, face_cascade, eyes_cascade)
         if cv.waitKey(10) == 27:
+            cv.VideoCapture(camera_device).release()
             break
 
 if __name__ == "__main__":
