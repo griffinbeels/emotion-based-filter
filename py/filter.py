@@ -68,7 +68,7 @@ class Filter:
         face = False
         if len(faces) > 0: # at least one face is detected, use the first one! TODO: add support for more than one face in frame 
             (x, y, w, h) = faces[0]
-
+            
             # Classify the emotion and vote in the current filter election
             emotion = classify_emotion(frame_gray, faces[0], model)
             self.process_filter_vote(emotion)
@@ -110,20 +110,29 @@ class Filter:
                 # Determine which ear combo should be used
                 self.try_update_filter()
 
+                # how much we want to scale the original ears pictures by
+                scale_factor = radius / 100
+
+                scale_tuple = lambda t, s : (math.floor(t[1] * s), math.floor(t[0] * s))
+                scaled_left_ear = cv.resize(self.elected_left_ear, scale_tuple(self.elected_left_ear.shape, scale_factor))
+                scaled_right_ear = cv.resize(self.elected_right_ear, scale_tuple(self.elected_right_ear.shape, scale_factor))
+                scaled_nose = cv.resize(self.nose, scale_tuple(self.nose.shape, scale_factor))
+
+
                 # Position the ears / nose according to the face orientation
-                y1, y2 = eye_list[0][1]-self.elected_left_ear.shape[0], eye_list[0][1] # TODO: error here?
-                x1, x2 = eye_list[0][0]-self.elected_left_ear.shape[1], eye_list[0][0] # error here?
-                y11, y21 = eye_list[1][1]-self.elected_right_ear.shape[0], eye_list[1][1]
-                x11, x21 = eye_list[1][0], eye_list[1][0]+self.elected_right_ear.shape[1]
+                y1, y2 = eye_list[0][1]-scaled_left_ear.shape[0], eye_list[0][1] # TODO: error here?
+                x1, x2 = eye_list[0][0]-scaled_left_ear.shape[1], eye_list[0][0] # error here?
+                y11, y21 = eye_list[1][1]-scaled_right_ear.shape[0], eye_list[1][1]
+                x11, x21 = eye_list[1][0], eye_list[1][0]+scaled_right_ear.shape[1]
                 if is_nose:
                     nose_offset_y = y+ny+math.ceil(nh/2)
                     nose_offset_x = x+nx+math.ceil(nw/2)
-                    y12, y22 = nose_offset_y-math.ceil(self.nose.shape[0]/2), nose_offset_y+math.floor(self.nose.shape[0]/2)
-                    x12, x22 =nose_offset_x-math.ceil(self.nose.shape[1]/2), nose_offset_x+math.floor(self.nose.shape[1]/2)
+                    y12, y22 = nose_offset_y-math.ceil(scaled_nose.shape[0]/2), nose_offset_y+math.floor(scaled_nose.shape[0]/2)
+                    x12, x22 =nose_offset_x-math.ceil(scaled_nose.shape[1]/2), nose_offset_x+math.floor(scaled_nose.shape[1]/2)
 
-                alpha_s = self.elected_left_ear[:, :, 3] / 255.0
-                alpha_s1 = self.elected_right_ear[:, :, 3] / 255.0
-                alpha_s2 = self.nose[:, :, 3] / 255.0
+                alpha_s = scaled_left_ear[:, :, 3] / 255.0
+                alpha_s1 = scaled_right_ear[:, :, 3] / 255.0
+                alpha_s2 = scaled_nose[:, :, 3] / 255.0
                 alpha_l = 1.0 - alpha_s
                 alpha_l1 = 1.0 - alpha_s1
                 alpha_l2 = 1.0 - alpha_s2
@@ -131,12 +140,12 @@ class Filter:
                     # Need to make sure all shapes are in bounds
                     if (y1 > 0 and y1 < frame.shape[0] and x1 > 0 and x1 < frame.shape[1] and
                         y2 > 0 and y2 < frame.shape[0] and x2 > 0 and x2 < frame.shape[1]):
-                        frame[y1:y2, x1:x2, c] = (alpha_s * self.elected_left_ear[:, :, c]) + (alpha_l * frame[y1:y2, x1:x2, c])
+                        frame[y1:y2, x1:x2, c] = (alpha_s * scaled_left_ear[:, :, c]) + (alpha_l * frame[y1:y2, x1:x2, c])
                     if (y11 > 0 and y11 < frame.shape[0] and x11 > 0 and x11 < frame.shape[1] and
                         y21 > 0 and y21 < frame.shape[0] and x21 > 0 and x21 < frame.shape[1]):
-                        frame[y11:y21, x11:x21, c] =  (alpha_s1 * self.elected_right_ear[:, :, c] + alpha_l1 * frame[y11:y21, x11:x21, c])
+                        frame[y11:y21, x11:x21, c] =  (alpha_s1 * scaled_right_ear[:, :, c] + alpha_l1 * frame[y11:y21, x11:x21, c])
                     if is_nose:
-                        frame[y12:y22, x12:x22, c] =  (alpha_s2 * self.nose[:, :, c] + alpha_l2 * frame[y12:y22, x12:x22, c])
+                        frame[y12:y22, x12:x22, c] =  (alpha_s2 * scaled_nose[:, :, c] + alpha_l2 * frame[y12:y22, x12:x22, c])
 
         cv.imshow('Capture - Face detection', frame)
 
