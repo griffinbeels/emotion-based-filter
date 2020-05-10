@@ -57,7 +57,7 @@ At this point you should be ready to run the files!  See the next section for ho
 To run without any changes (i.e., open your webcam, load the pretrained weights, detect emotion on each frame), simply cd to this repo, and then run:
 
 ```
-python3.7 py/face_detection.py
+python3.7 py/main.py
 ```
 
 The only parameters you might want to change are:
@@ -65,8 +65,6 @@ The only parameters you might want to change are:
 * `--model_mode`: entering "train" will train the CNN using the provided FER-2013 dataset over 50 epochs before running your webcam; entering nothing, or explicitly entering "display" will simply run the process described at the beginning of this section.
 
 * `--camera`: by default, this is `0` which represents your built in webcam.  If you would like to use an external webcam, then change this number until it works.
-
-
 
 ## **Results**
 Our results are outlined in a formal paper included in our repo as `/emotion-based-filter/report.pdf`, including plenty of pictures!  
