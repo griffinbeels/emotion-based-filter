@@ -15,6 +15,7 @@ Once downloaded, copy the contents of the folder to the root `/emotion-based-fil
 It is also possible that this repo actually *already* contains the `data/test` and `data/train` folders, in which case you should ignore this subsection.
 Additionally, we include a model that *we did not train* from [priya-dwivedi](https://github.com/priya-dwivedi/face_and_emotion_detection), who has made their trained model public!  Check the [How to Run section](# How to Run) for details on how to swap between our model and Priya's model.
 
+### **MacOS and Linux/Git Bash Setup**
 ### **Virtual Environment**
 In order to easily run all of the files, and make sure that all dependencies are satsified, it is easiest to use a virtual environment.
 To install the virtualenv module, run the following in a new terminal session (make sure that no other virtual environments are active):
@@ -42,6 +43,42 @@ Next install the necessary packages to your virtual environment by running these
 (emotion_venv) pip3 install -r requirements.txt
 ```
 (note: (emotion_venv) is included in the above lines to indicate you should have called the source command above to enter the virtual environment before installing; do not type (emotion_venv))
+
+### **Windows Setup**
+For the most part, the instructions can be completed on Windows operating systems using a shell such as git bash, however,
+there may be some difficulties during the setup process, such as running into the following error when running pip install on the requirements: 
+"cmake must be installed to build the following extensions dlib"
+Therefore, the section below will be useful as an alternative.
+Note: windows uses backslashes for directory navigation "\" as opposed to MacOS and Linux, which use forward slashes "/".
+
+You will need to be using a command prompt with access to CMake such as "Developer Command Prompt for VS 2019"
+
+Install the virtual environment module with the following command:
+```
+pip3 install virtualenv
+```
+
+Next, navigate to a directory of your choice (perhaps the parent directory to this repo) and run:
+
+```
+virtualenv emotion_venv
+```
+
+The virtualenv command above creates a new directory called "emotion_venv" that contains your new virtual environment (env). You can activate this using the following command (in the directory that contains the emotion_venv folder):
+Here is where the commands start to deviate slightly.
+
+```
+.\emotion_venv\Scripts\activate
+```
+
+Next install the necessary packages to your virtual environment by running these two commands (assuming you're in the folder containing this repo):
+
+```
+(emotion_venv) cd emotion-based-filter
+(emotion_venv) pip3 install -r requirements.txt
+```
+(note: (emotion_venv) is included in the above lines to indicate you should have called the source command above to enter the virtual environment before installing; do not type (emotion_venv))
+
 
 ### **VSCode Setup on MacOS**
 If you're running this in VSCode, and are on MacOS, you might need to take an extra step to get everything going.
