@@ -1,7 +1,7 @@
 from __future__ import print_function
 import argparse
 import cv2 as cv
-from hyperparameters import HAAR_EYE_FILE_PATH, HAAR_FACE_FILE_PATH, CAMERA_IDX
+from hyperparameters import HAAR_EYE_FILE_PATH, HAAR_FACE_FILE_PATH, HAAR_NOSE_FILE_PATH, CAMERA_IDX
 from emotion import train_or_load_model
 from filter import Filter
 
@@ -23,6 +23,7 @@ def parse_input_and_load():
     parser = argparse.ArgumentParser(description='Code for Emotion Based Filtering.')
     parser.add_argument('--face_cascade', help='Path to face cascade.', default=HAAR_FACE_FILE_PATH)
     parser.add_argument('--eyes_cascade', help='Path to eyes cascade.', default=HAAR_EYE_FILE_PATH)
+    parser.add_argument('--nose_cascade', help='Path to eyes cascade.', default=HAAR_NOSE_FILE_PATH)
     parser.add_argument("--model_mode",help='Whether or not we want to [train] the model, or [display] results.', default='display')
     parser.add_argument('--camera', help='Camera divide number.', type=int, default=CAMERA_IDX)
 
@@ -31,6 +32,7 @@ def parse_input_and_load():
     mode = args.model_mode
     face_cascade = cv.CascadeClassifier()
     eyes_cascade = cv.CascadeClassifier()
+    nose_cascade = cv.CascadeClassifier()
     camera_device = args.camera
 
     #-- load the cascades
@@ -40,8 +42,11 @@ def parse_input_and_load():
     if not eyes_cascade.load(cv.samples.findFile(args.eyes_cascade)):
         print('--(!)Error loading eyes cascade')
         exit(0)
+    if not nose_cascade.load(cv.samples.findFile(args.nose_cascade)):
+        print('--(!)Error loading nose cascade')
+        exit(0)
     
-    return (mode, face_cascade, eyes_cascade, camera_device)
+    return (mode, face_cascade, eyes_cascade, nose_cascade, camera_device)
 
 def main():
     """ 
@@ -50,7 +55,7 @@ def main():
     detection.
     """
     #-- parse the arguments passed into this py file in prep for the main read loop
-    (mode, face_cascade, eyes_cascade, camera_device) = parse_input_and_load()
+    (mode, face_cascade, eyes_cascade, nose_cascade, camera_device) = parse_input_and_load()
 
     #-- populate the emotion classification model (if preloaded, simply load, else train).
     model = train_or_load_model(mode)
@@ -72,7 +77,7 @@ def main():
             break
 
         # if valid, we process the frame -- i.e., detect face + emotion + apply filter
-        my_filter.detect_and_display(frame, face_cascade, eyes_cascade, model)
+        my_filter.detect_and_display(frame, face_cascade, eyes_cascade, nose_cascade, model)
 
         # corresponds to ESC key
         if cv.waitKey(10) == 27:

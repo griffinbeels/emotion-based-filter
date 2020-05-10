@@ -30,6 +30,7 @@ MODEL_DATA_FILE_PATH = "data/model.h5"
 # Cascade related files -- run from the ocv (open cv) directory
 HAAR_FACE_FILE_PATH = "ocv/haarcascade_frontalface_alt.xml"
 HAAR_EYE_FILE_PATH = "ocv/haarcascade_eye_tree_eyeglasses.xml"
+HAAR_NOSE_FILE_PATH = "ocv/haarcascade_mcs_nose.xml"
 
 # Default camera index - change if using external webcam
 CAMERA_IDX = 0

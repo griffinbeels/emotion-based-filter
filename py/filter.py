@@ -32,7 +32,10 @@ class Filter:
         self.neutral_right_img = cv.imread("img/ear_neutral_right.png", -1)
         self.nose = cv.imread("img/nose.png", -1)
 
-    def detect_and_display(self, frame, face_cascade, eyes_cascade, model):
+        # stores the last detected nose coordinates so that the image doesn't flicker
+        self.nose_cache = None
+
+    def detect_and_display(self, frame, face_cascade, eyes_cascade, nose_cascade, model):
         """
         Given a camera frame loaded from the user's webcam, detects all visible faces,
         classifies emotion for any faces found, and changes between a set of filters depending 
@@ -45,6 +48,8 @@ class Filter:
                 -desc: the cascade xml obtained from OpenCV for use in face detection
             -eyes_cascade :: loaded xml file
                 -desc: the cascade xml obtained from OpenCV for use in eye detection
+            -nose_cascade :: loaded xml file
+                -desc: the cascade xml obtained from OpenCV for use in nose detection
             model :: Sequential Tensorflow Model
                 -desc: model trained to classify Emotion
         
@@ -78,8 +83,23 @@ class Filter:
             eye_list[1] = (center[0] + radius/2, center[1]-radius/2)
             if (w < face_radius) or(h < face_radius):
                 face = False
+
+            faceROI = frame_gray[y:y+h, x:x+w]
             #-- In each face, detect eyes
             # eyes = eyes_cascade.detectMultiScale(faceROI)
+
+            #-- In each face, detect nose (Note: coordinates are in terms of face dimensions, not whole frame)
+            nose_coords = nose_cascade.detectMultiScale(faceROI);
+            if len(nose_coords) > 0:
+                self.nose_cache = nose_coords
+            nx, ny, nw, nh = None, None, None, None
+
+            # Check if the nose was detected or not
+            is_nose = False
+            if len(self.nose_cache) > 0:
+                (nx, ny, nw, nh) = self.nose_cache[0]
+                is_nose = True
+            
 
             # for (x2,y2,w2,h2) in eyes:
             #     eye_center = (x + x2 + w2//2, y + y2 + h2//2)
@@ -95,8 +115,12 @@ class Filter:
                 x1, x2 = eye_list[0][0]-self.elected_left_ear.shape[1], eye_list[0][0] # error here?
                 y11, y21 = eye_list[1][1]-self.elected_right_ear.shape[0], eye_list[1][1]
                 x11, x21 = eye_list[1][0], eye_list[1][0]+self.elected_right_ear.shape[1]
-                y12, y22 = y_offset2-math.ceil(self.nose.shape[0]/2), y_offset2+math.floor(self.nose.shape[0]/2)
-                x12, x22 = x_offset2-math.ceil(self.nose.shape[1]/2), x_offset2+math.floor(self.nose.shape[1]/2)
+                if is_nose:
+                    nose_offset_y = y+ny+math.ceil(nh/2)
+                    nose_offset_x = x+nx+math.ceil(nw/2)
+                    y12, y22 = nose_offset_y-math.ceil(self.nose.shape[0]/2), nose_offset_y+math.floor(self.nose.shape[0]/2)
+                    x12, x22 =nose_offset_x-math.ceil(self.nose.shape[1]/2), nose_offset_x+math.floor(self.nose.shape[1]/2)
+
                 alpha_s = self.elected_left_ear[:, :, 3] / 255.0
                 alpha_s1 = self.elected_right_ear[:, :, 3] / 255.0
                 alpha_s2 = self.nose[:, :, 3] / 255.0
@@ -106,7 +130,8 @@ class Filter:
                 for c in range(0, 3):
                     frame[y1:y2, x1:x2, c] = (alpha_s * self.elected_left_ear[:, :, c]) + (alpha_l * frame[y1:y2, x1:x2, c])
                     frame[y11:y21, x11:x21, c] =  (alpha_s1 * self.elected_right_ear[:, :, c] + alpha_l1 * frame[y11:y21, x11:x21, c])
-                    frame[y12:y22, x12:x22, c] =  (alpha_s2 * self.nose[:, :, c] + alpha_l2 * frame[y12:y22, x12:x22, c])
+                    if is_nose:
+                        frame[y12:y22, x12:x22, c] =  (alpha_s2 * self.nose[:, :, c] + alpha_l2 * frame[y12:y22, x12:x22, c])
 
         cv.imshow('Capture - Face detection', frame)
 
