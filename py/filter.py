@@ -91,7 +91,7 @@ class Filter:
             # eyes = eyes_cascade.detectMultiScale(faceROI)
 
             #-- In each face, detect nose (Note: coordinates are in terms of face dimensions, not whole frame)
-            nose_coords = nose_cascade.detectMultiScale(faceROI)
+            nose_coords = nose_cascade.detectMultiScale(image=faceROI, flags=cv.CASCADE_FIND_BIGGEST_OBJECT, minSize=(50, 50))
             if len(nose_coords) > 0:
                 self.nose_cache = nose_coords
             nx, ny, nw, nh = None, None, None, None
@@ -100,6 +100,7 @@ class Filter:
             is_nose = False
             if len(self.nose_cache) > 0:
                 (nx, ny, nw, nh) = self.nose_cache[0]
+                print("Nose width & height: ", nw, nh)
                 is_nose = True
             
 
