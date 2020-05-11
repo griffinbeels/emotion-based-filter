@@ -59,14 +59,16 @@ class Filter:
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         frame_gray = cv.equalizeHist(frame_gray)
         #-- Detect faces
-        faces = face_cascade.detectMultiScale(frame_gray)
+        # Finds the biggest object instead (previous found all faces) and mandates a minimum size
+        faces = face_cascade.detectMultiScale(image=frame_gray, flags=cv.CASCADE_FIND_BIGGEST_OBJECT, minSize=(30, 30))
         # Set some face resc cut off for no weird jank.
         face_radius = 100
         
         # print(s_img.shape)
         eye_list = np.zeros((2,2), dtype=int)
         face = False
-        if len(faces) > 0: # at least one face is detected, use the first one! TODO: add support for more than one face in frame 
+        if len(faces) > 0: # at least one face is detected, use the first one! TODO: add support for more than one face in frame
+
             (x, y, w, h) = faces[0]
             
             # Classify the emotion and vote in the current filter election
@@ -89,7 +91,7 @@ class Filter:
             # eyes = eyes_cascade.detectMultiScale(faceROI)
 
             #-- In each face, detect nose (Note: coordinates are in terms of face dimensions, not whole frame)
-            nose_coords = nose_cascade.detectMultiScale(faceROI);
+            nose_coords = nose_cascade.detectMultiScale(faceROI)
             if len(nose_coords) > 0:
                 self.nose_cache = nose_coords
             nx, ny, nw, nh = None, None, None, None
