@@ -9,7 +9,7 @@ class Emotion(enum.Enum):
     neutral = 4
     sad = 5
     surprised = 6
-
+ 
 # Maps numbers [0, 6] to each emotion, for use in processing the model classification; uses Emotion enum
 EMOTIONS = {Emotion.angry: "Angry",
             Emotion.disgusted: "Disgusted",
