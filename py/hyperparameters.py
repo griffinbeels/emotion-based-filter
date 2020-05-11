@@ -20,7 +20,7 @@ EMOTIONS = {Emotion.angry: "Angry",
             Emotion.surprised: "Surprised"}
 
 # The required number of frames to be processed before a filter is elected and votes are tallied.
-VOTES_REQUIRED_FOR_ELECTION = 3
+VOTES_REQUIRED_FOR_ELECTION = 4
 
 # These files are run from the /py directory
 TRAINING_DIRECTORY = "data/train"
@@ -42,3 +42,6 @@ INPUT_DIM = 48
 BATCH_SIZE = 64
 NUM_EPOCHS = 50
 LEARNING_RATE = 1e-4
+
+# Maximum number of failures before the caches reset
+MAX_DETECT_FAILURES = 10

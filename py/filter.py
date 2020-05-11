@@ -1,6 +1,6 @@
 from __future__ import print_function
 import hyperparameters as hp
-from hyperparameters import Emotion, EMOTIONS, INPUT_DIM, VOTES_REQUIRED_FOR_ELECTION
+from hyperparameters import Emotion, EMOTIONS, INPUT_DIM, VOTES_REQUIRED_FOR_ELECTION, MAX_DETECT_FAILURES
 from emotion import classify_emotion
 import cv2 as cv
 import math
@@ -34,6 +34,10 @@ class Filter:
 
         # stores the last detected nose coordinates so that the image doesn't flicker
         self.nose_cache = []
+        self.face_cache = []
+
+        # how many times we've failed in a row to detect a face
+        self.sequential_failures = 0
 
     def detect_and_display(self, frame, face_cascade, eyes_cascade, nose_cascade, model):
         """
@@ -58,25 +62,48 @@ class Filter:
         """
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         frame_gray = cv.equalizeHist(frame_gray)
-        #-- Detect faces
-        # Finds the biggest object instead (previous found all faces) and mandates a minimum size
-        faces = face_cascade.detectMultiScale(image=frame_gray, flags=cv.CASCADE_FIND_BIGGEST_OBJECT, minSize=(30, 30))
+
         # Set some face resc cut off for no weird jank.
         face_radius = 100
-        
+
         # print(s_img.shape)
         eye_list = np.zeros((2,2), dtype=int)
-        face = False
-        if len(faces) > 0: # at least one face is detected, use the first one! TODO: add support for more than one face in frame
+        has_face = True
 
-            (x, y, w, h) = faces[0]
-            
+        #-- Detect faces
+        # Finds the biggest object instead (previous found all faces) and mandates a minimum size
+        faces = face_cascade.detectMultiScale(image=frame_gray, flags=cv.CASCADE_FIND_BIGGEST_OBJECT, minSize=(face_radius, face_radius))
+
+        # FACE CACHING
+        if len(faces) > 0:
+            self.sequential_failures = 0
+            (fx, fy, fw, fh) = faces[0]
+            if len(self.face_cache) > 0: # if previous face exists
+                (old_x, old_y, old_w, old_h) = self.face_cache
+                # If the new face is outside of the bounding box, reset nose cache.
+                lower_x = old_x - (old_w)
+                upper_x = old_x + (old_w)
+                lower_y = old_y - (old_h)
+                upper_y = old_y + (old_h)
+                if (fx <= lower_x or fx >= upper_x or
+                    fy <= lower_y or fy >= upper_y):
+                    self.nose_cache = []
+            # Always update face cache
+            self.face_cache = faces[0]
+        else:
+            self.sequential_failures += 1
+        # FACE CACHING
+
+        # If we've failed too many times in a row, reset the cache until success.
+        if self.sequential_failures >= MAX_DETECT_FAILURES:
+            self.face_cache = []
+            self.nose_cache = []
+
+        if len(self.face_cache) > 0: # at least one face is detected, use the first one! TODO: add support for more than one face in frame  
+            (x, y, w, h) = self.face_cache
             # Classify the emotion and vote in the current filter election
-            emotion = classify_emotion(frame_gray, faces[0], model)
+            emotion = classify_emotion(frame_gray, self.face_cache, model)
             self.process_filter_vote(emotion)
-            
-        # for (x,y,w,h) in faces:
-            face = True
             center = (x + w//2, y + h//2)        
             x_offset2=center[0]
             y_offset2=center[1]
@@ -84,7 +111,7 @@ class Filter:
             eye_list[0] = (center[0] - radius/2, center[1]-radius/2)
             eye_list[1] = (center[0] + radius/2, center[1]-radius/2)
             if (w < face_radius) or(h < face_radius):
-                face = False
+                has_face = False
 
             faceROI = frame_gray[y:y+h, x:x+w]
             #-- In each face, detect eyes
@@ -93,14 +120,25 @@ class Filter:
             #-- In each face, detect nose (Note: coordinates are in terms of face dimensions, not whole frame)
             nose_coords = nose_cascade.detectMultiScale(image=faceROI, flags=cv.CASCADE_FIND_BIGGEST_OBJECT, minSize=(50, 50))
             if len(nose_coords) > 0:
-                self.nose_cache = nose_coords
+                (nx, ny, nw, nh) = nose_coords[0]
+                if len(self.nose_cache) > 0:
+                    (old_x, old_y, old_w, old_h) = self.nose_cache
+                    # If the new position is reasonably close
+                    lower_x = old_x - (old_w)
+                    upper_x = old_x + (old_w)
+                    lower_y = old_y - (old_h)
+                    upper_y = old_y + (old_h)
+                    if (nx >= lower_x and nx <= upper_x and
+                        ny >= lower_y and ny <= upper_y):
+                        self.nose_cache = nose_coords[0]
+                else:
+                    self.nose_cache = nose_coords[0]
             nx, ny, nw, nh = None, None, None, None
 
             # Check if the nose was detected or not
             is_nose = False
             if len(self.nose_cache) > 0:
-                (nx, ny, nw, nh) = self.nose_cache[0]
-                print("Nose width & height: ", nw, nh)
+                (nx, ny, nw, nh) = self.nose_cache
                 is_nose = True
             
 
@@ -109,7 +147,7 @@ class Filter:
             #     radius = int(round((w2 + h2)*0.25))
             #     frame = cv.circle(frame, eye_center, radius, (255, 0, 0 ), 4)
 
-            if face and (x_offset2 < frame.shape[0]):
+            if has_face and (x_offset2 < frame.shape[0]):
                 # Determine which ear combo should be used
                 self.try_update_filter()
 
