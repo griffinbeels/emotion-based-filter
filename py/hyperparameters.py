@@ -20,7 +20,7 @@ EMOTIONS = {Emotion.angry: "Angry",
             Emotion.surprised: "Surprised"}
 
 # The required number of frames to be processed before a filter is elected and votes are tallied.
-VOTES_REQUIRED_FOR_ELECTION = 4
+VOTES_REQUIRED_FOR_ELECTION = 5
 
 # These files are run from the /py directory
 TRAINING_DIRECTORY = "data/train"
